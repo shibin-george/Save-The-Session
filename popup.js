@@ -4,11 +4,12 @@
  *         National Institute of Technology, Warangal
  **/
 
-function getData(callback, errorCallback) {
+ function getData(callback, errorCallback) {
 
   //code to query the tabs
   var s = "";
-  var padding = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  //var padding = "               ";
+
   chrome.tabs.query({'currentWindow':true}, function(tabs){
     var checkList = document.createElement("div");
     checkList.setAttribute("id", "checklist");
@@ -23,7 +24,8 @@ function getData(callback, errorCallback) {
     }
     var displayLength = maxlen - 3*maxlen/4;
 
-    displayLength = Math.min(displayLength, 60);
+    if(displayLength < 50)
+      displayLength = 50;
     //console.log(maxlen + ' \tdisplayLength = ', displayLength);
 
     for(i=0;i<tabs.length;i++){
@@ -37,8 +39,15 @@ function getData(callback, errorCallback) {
 
       //add a checkbox by the tab's name
       var box = document.createElement("div");
-      box.setAttribute("id", "Checkboxes"+i);
-      box.innerHTML = '<input type="checkbox" name="Select">\t' + shortname;
+      box.setAttribute("id", "Checkbox" + i);
+      box.setAttribute("name", s);
+
+      //TODO: this here is a vulnerability.
+      //if two tabs with the exact same url are open, 
+      //this may show undefined behaviour.
+      //As per HTML standard, 
+      //no two elements should have same ID, document-wide.
+      box.innerHTML = '<input type="checkbox" name="Select" id=' + s +'>\t' + shortname;
 
       //add the checkbox to the list
       document.getElementById('checklist').appendChild(box);      
@@ -63,7 +72,7 @@ function getData(callback, errorCallback) {
     button.onclick = function(){
       finalizeChoice();
     }
-     
+    
     document.getElementById('checklist').appendChild(button);
   });
 }
@@ -82,14 +91,30 @@ function toggle(){
   }
 }
 
+function finalizeChoice(){
+
+  // TODO: to be fixed as soon as
+  // a workaround to the previous TODO is found.
+  var tabs = document.getElementsByName('Select');
+  var s = "";
+  console.log("Number of checkboxes = " + tabs.length);
+  for(i=0; i<tabs.length; i++){
+    if(tabs[i].checked==true){
+      //this particular tab has to be added
+      s += tabs[i].id + "\n";
+    }
+  }
+  renderStatus("You have chosen the following tabs:\n" + s);
+}
+
 function renderStatus(statusText) {
   document.getElementById('status').textContent = statusText;
 }
 
 document.addEventListener('DOMContentLoaded', function() {  
-    renderStatus('Loading the content...');
-    getData({
-    }, function(errorMessage) {
-      renderStatus('Cannot display results: ' + errorMessage);
-    });
+  renderStatus('Loading the content...');
+  getData({
+  }, function(errorMessage) {
+    renderStatus('Cannot display results: ' + errorMessage);
   });
+});
