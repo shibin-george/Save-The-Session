@@ -8,91 +8,87 @@ function getData(callback, errorCallback) {
 
   //code to query the tabs
   var s = "";
+  var padding = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
   chrome.tabs.query({'currentWindow':true}, function(tabs){
     var checkList = document.createElement("div");
     checkList.setAttribute("id", "checklist");
-    document.appendChild(checkList);
+    document.getElementById('status').innerHTML = 'The open tabs are: \n';
+    document.getElementById('status').appendChild(checkList);
+
+    //code for appropriate padding
+    var maxlen = 0;
+    for(i=0;i<tabs.length;i++){
+      s = tabs[i].url;
+      maxlen = Math.max(maxlen, s.length);
+    }
+    var displayLength = maxlen - 3*maxlen/4;
+
+    displayLength = Math.min(displayLength, 60);
+    //console.log(maxlen + ' \tdisplayLength = ', displayLength);
 
     for(i=0;i<tabs.length;i++){
       var s = tabs[i].url;
       var shortname="";
-      if(s.length > 30){
-        shortname = s.substring(0, 25) + '...';
+      if(s.length > displayLength){
+        shortname = s.substring(0, displayLength) + '..';
       } else {
-        shortname = s ;
+        shortname = s;
       }
+
+      //add a checkbox by the tab's name
       var box = document.createElement("div");
-      box.setAttribute("id", "Checkboxes");
-      var chbox = document.createElement("input");
-      chbox.setAttribute("type", "checkbox");
-      chbox.setAttribute("name", s);
-      box.innerHTML = shortname;
-      box.appendChild(chbox);
-      
-      //box.appendChild(checkbox);
-      document.getElementById('checklist').appendChild(box);
+      box.setAttribute("id", "Checkboxes"+i);
+      box.innerHTML = '<input type="checkbox" name="Select">\t' + shortname;
+
+      //add the checkbox to the list
+      document.getElementById('checklist').appendChild(box);      
     }
+
+    //add a checkbox to select all
     var box = document.createElement("div");
     box.setAttribute("id", "CheckAll");
-    box.setAttribute("onchange", "checkAll(this)");
-    box.innerHTML = 'Click Here to select All <input type="checkbox" name=SelectALL>';
-      
-    //box.appendChild(checkbox);
+    box.innerHTML = '\n<input type="checkbox" id="SelectALL">\t' + 'Click Here to select All\n';
     document.getElementById('checklist').appendChild(box);
-    //renderStatus(s);
-    //var numTabs = document.getElementById('Checkboxes')[0].name;
-    //renderStatus('' + numTabs);
-    document.getElementById('CheckAll').addEventListener('change', function(){
-      //renderStatus("ALLLLLLLLLLL");
-      var checks = document.getElementById('Checklist').childNodes;
-      var bool = document.getElementById('CheckAll').checked;
-      for(i=0;i<checks.length;i++){
-        checks[i].setAttribute("checked", bool);
-      }
-      //var numTabs = document.getElementById('checklist').length;
-      //renderStatus(numTabs);
-    });
 
-  });
-  
-  
-  //renderStatus(s);
+    //add an event handler for the 'Select all' checkbox
+    //this invokes the toggle() function
+    document.getElementById('SelectALL').onchange = function(){
+      toggle();
+    };
 
-  /*for(i=0;i<1000;i++){
-    for(j=0;j<1000;j++){
-      renderStatus("asdad");
+    //add a button to finalise the list
+    var button = document.createElement("div");
+    button.setAttribute("id", "OKButton");
+    button.innerHTML = '\n<button> Click to add </button>';
+    button.onclick = function(){
+      finalizeChoice();
     }
-  }*/
-  //renderStatus(s);
-  /*x.onerror = function() {
-    errorCallback('Network error.');
-  };
-  x.send();*/
+     
+    document.getElementById('checklist').appendChild(button);
+  });
 }
 
-function checkAll(ele){
-  renderStatus('asdad');
-  /*var checks = document.getElementById('Checklist').childNodes;
-  var bool = document.getElementById('CheckAll').checked;
+function toggle(){  
+  var c = document.getElementById('SelectALL');
+  var bool = c.checked;
+  //renderStatus(" " + bool + "");
+  var checks = document.getElementsByName('Select');
+
   for(i=0;i<checks.length;i++){
-    checks[i].setAttribute("checked", bool);
-  }*/
+    //console.log('toggle called for ' + i + ' currently ' + checks[i].checked);
+    if(checks[i].type=='checkbox'){
+      checks[i].checked = bool;
+    }
+  }
 }
 
 function renderStatus(statusText) {
   document.getElementById('status').textContent = statusText;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  
+document.addEventListener('DOMContentLoaded', function() {  
     renderStatus('Loading the content...');
-
     getData({
-
-      //renderStatus('Search term: ' + url + '\n' +
-      //    'Google image search result: ' + imageUrl);
-      
-
     }, function(errorMessage) {
       renderStatus('Cannot display results: ' + errorMessage);
     });
