@@ -1,120 +1,149 @@
-/**
- * Author: Shibin George
- *         B.Tech CSE(4/4), Class of 2015
- *         National Institute of Technology, Warangal
- **/
+  /**
+   * Author: Shibin George
+   *         B.Tech CSE(4/4), Class of 2015
+   *         National Institute of Technology, Warangal
+   **/
 
- function getData(callback, errorCallback) {
+   function getData(callback, errorCallback) {
 
-  //code to query the tabs
-  var s = "";
-  //var padding = "               ";
+    //code to query the tabs
+    var s = "";
+    //var padding = "               ";
 
-  chrome.tabs.query({'currentWindow':true}, function(tabs){
-    var checkList = document.createElement("div");
-    checkList.setAttribute("id", "checklist");
-    document.getElementById('status').innerHTML = 'The open tabs are: \n';
-    document.getElementById('status').appendChild(checkList);
+    chrome.tabs.query({'currentWindow':true}, function(tabs){
+      var checkList = document.createElement("div");
+      checkList.setAttribute("id", "checklist");
+      document.getElementById('status').innerHTML = 'The open tabs are: \n';
+      document.getElementById('status').appendChild(checkList);
 
-    //code for appropriate padding
-    var maxlen = 0;
-    for(i=0;i<tabs.length;i++){
-      s = tabs[i].url;
-      maxlen = Math.max(maxlen, s.length);
-    }
-    var displayLength = maxlen - 3*maxlen/4;
+      //code for appropriate padding
+      var maxlen = 0;
+      for(i=0;i<tabs.length;i++){
+        s = tabs[i].url;
+        maxlen = Math.max(maxlen, s.length);
+      }
+      var displayLength = maxlen - 3*maxlen/4;
 
-    if(displayLength < 50)
-      displayLength = 50;
-    //console.log(maxlen + ' \tdisplayLength = ', displayLength);
+      if(displayLength < 40)
+        displayLength = 40;
+      if(displayLength > 60)
+        displayLength = 40;
+      console.log(maxlen + ' \tdisplayLength = ', displayLength);
 
-    for(i=0;i<tabs.length;i++){
-      var s = tabs[i].url;
-      var shortname="";
-      if(s.length > displayLength){
-        shortname = s.substring(0, displayLength) + '..';
-      } else {
-        shortname = s;
+      for(i=0;i<tabs.length;i++){
+        var s = tabs[i].url;
+        var shortname=returnShortName(s, displayLength);
+console.log(shortname);
+        //add a checkbox by the tab's name
+        var box = document.createElement("div");
+        box.setAttribute("id", "Checkbox" + i);
+        box.setAttribute("name", s);
+
+        //TODO: this here is a vulnerability.
+        //if two tabs with the exact same url are open, 
+        //this may show undefined behaviour.
+        //As per HTML standard, 
+        //no two elements should have same ID, document-wide.
+        box.innerHTML = '<input type="checkbox" name="Select" id=' + s +'>\t' + shortname;
+
+        //add the checkbox to the list
+        document.getElementById('checklist').appendChild(box);      
       }
 
-      //add a checkbox by the tab's name
+      //add a checkbox to select all
       var box = document.createElement("div");
-      box.setAttribute("id", "Checkbox" + i);
-      box.setAttribute("name", s);
+      box.setAttribute("id", "CheckAll");
+      box.innerHTML = '\n<input type="checkbox" id="SelectALL">\t' + 'Click Here to select All\n';
+      document.getElementById('checklist').appendChild(box);
 
-      //TODO: this here is a vulnerability.
-      //if two tabs with the exact same url are open, 
-      //this may show undefined behaviour.
-      //As per HTML standard, 
-      //no two elements should have same ID, document-wide.
-      box.innerHTML = '<input type="checkbox" name="Select" id=' + s +'>\t' + shortname;
+      //add an event handler for the 'Select all' checkbox
+      //this invokes the toggle() function
+      document.getElementById('SelectALL').onchange = function(){
+        toggle();
+      };
 
-      //add the checkbox to the list
-      document.getElementById('checklist').appendChild(box);      
-    }
+      //add a button to finalise the list
+      var button = document.createElement("div");
+      button.setAttribute("id", "OKButton");
+      button.innerHTML = '\n<button> Click to add </button>';
+      button.onclick = function(){
+        finalizeChoice();
+      }
+      
+      document.getElementById('checklist').appendChild(button);
+    });
+}
 
-    //add a checkbox to select all
-    var box = document.createElement("div");
-    box.setAttribute("id", "CheckAll");
-    box.innerHTML = '\n<input type="checkbox" id="SelectALL">\t' + 'Click Here to select All\n';
-    document.getElementById('checklist').appendChild(box);
-
-    //add an event handler for the 'Select all' checkbox
-    //this invokes the toggle() function
-    document.getElementById('SelectALL').onchange = function(){
-      toggle();
-    };
-
-    //add a button to finalise the list
-    var button = document.createElement("div");
-    button.setAttribute("id", "OKButton");
-    button.innerHTML = '\n<button> Click to add </button>';
-    button.onclick = function(){
-      finalizeChoice();
-    }
-    
-    document.getElementById('checklist').appendChild(button);
-  });
+function returnShortName(s, d){
+  var shortname="";
+  if(s.length > d){
+    shortname = s.substring(0, d) + '..';
+  } else {
+    shortname = s;
+  }
+  return shortname;
 }
 
 function toggle(){  
   var c = document.getElementById('SelectALL');
   var bool = c.checked;
-  //renderStatus(" " + bool + "");
-  var checks = document.getElementsByName('Select');
+    //renderStatus(" " + bool + "");
+    var checks = document.getElementsByName('Select');
 
-  for(i=0;i<checks.length;i++){
-    //console.log('toggle called for ' + i + ' currently ' + checks[i].checked);
-    if(checks[i].type=='checkbox'){
-      checks[i].checked = bool;
+    for(i=0;i<checks.length;i++){
+      //console.log('toggle called for ' + i + ' currently ' + checks[i].checked);
+      if(checks[i].type=='checkbox'){
+        checks[i].checked = bool;
+      }
     }
   }
-}
 
-function finalizeChoice(){
-
-  // TODO: to be fixed as soon as
-  // a workaround to the previous TODO is found.
-  var tabs = document.getElementsByName('Select');
-  var s = "";
-  console.log("Number of checkboxes = " + tabs.length);
-  for(i=0; i<tabs.length; i++){
-    if(tabs[i].checked==true){
-      //this particular tab has to be added
-      s += tabs[i].id + "\n";
+  function finalizeChoice(){
+    // TODO: to be fixed as soon as
+    // a workaround to the previous TODO is found.
+    var tabs = document.getElementsByName('Select');
+    var s = "";
+    var numChoices = 0;
+    console.log("Number of checkboxes = " + tabs.length);
+    for(i=0; i<tabs.length; i++){
+      if(tabs[i].checked==true){
+        //this particular tab has to be added
+        s += returnShortName(tabs[i].id, 40) + "\n";
+        numChoices += 1;
+      }
     }
+    //renderStatus("You have chosen the following tabs:\n" + s);
+    document.getElementById('status').innerHTML = '';
+    var tnode;
+    var status = document.getElementById('status');
+    //renderStatus('');
+    if(numChoices > 0){      
+      var rand = Math.floor(Math.random()*1100);
+      var inputHTML = '\nEnter the profile name: <input type="text" name="ProfileName" value="Profile' + rand + '"><br>';
+      var buttonHTML = ''
+      status.innerHTML = 'You have chosen the following tabs:\n' + s + inputHTML ;
+      
+      var button = document.createElement("div");
+      button.setAttribute("id", "ProfileSubmitButton");
+      button.innerHTML = '\n<button> Click to save </button>';
+      status.appendChild(button);
+      button.onclick = function(){
+        renderStatus('You are awesome Shibin.\n');
+        //finalizeChoice();
+      }
+    } else {
+      status.innerHTML = "You must choose atleat one tab."
+    }    
   }
-  renderStatus("You have chosen the following tabs:\n" + s);
-}
 
-function renderStatus(statusText) {
-  document.getElementById('status').textContent = statusText;
-}
+  function renderStatus(statusText) {
+    document.getElementById('status').textContent = statusText;
+  }
 
-document.addEventListener('DOMContentLoaded', function() {  
-  renderStatus('Loading the content...');
-  getData({
-  }, function(errorMessage) {
-    renderStatus('Cannot display results: ' + errorMessage);
+  document.addEventListener('DOMContentLoaded', function() {  
+    renderStatus('Loading the content...');
+    getData({
+    }, function(errorMessage) {
+      renderStatus('Cannot display results: ' + errorMessage);
+    });
   });
-});
