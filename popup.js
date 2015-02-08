@@ -5,9 +5,9 @@
    **/
 
 function queryTabs(callback, errorCallback) {
+  
   //code to query the tabs
   var s = "";
-  //var padding = "               ";
 
   chrome.tabs.query({'currentWindow':true}, function(tabs){
     var checkList = document.createElement("div");
@@ -38,11 +38,12 @@ function queryTabs(callback, errorCallback) {
       box.setAttribute("id", "Checkbox" + i);
       box.setAttribute("name", s);
 
-      //TODO: this here is a vulnerability.
-      //if two tabs with the exact same url are open, 
-      //this may show undefined behaviour.
-      //As per HTML standard, 
-      //no two elements should have same ID, document-wide.
+      /*  TODO: this here is a vulnerability.
+       *  if two tabs with the exact same url are open, 
+       *  this may show undefined behaviour.
+       *  As per HTML standard, 
+       *  no two elements should have same ID, document-wide.
+       */
       box.innerHTML = '<input type="checkbox" name="Select" id=' + s +'>\t' + shortname;
 
       //add the checkbox to the list
@@ -71,6 +72,13 @@ function queryTabs(callback, errorCallback) {
     
     document.getElementById('checklist').appendChild(button);
   });
+  dummyLoading(2);
+}
+
+function dummyLoading(t){
+  var status = document.getElementById('status');
+  var w = document.createElement('div');
+  w.innerHTML = "<img class='loading' src=" + chrome.extension.getURL('loading.gif') + "</img>";
 }
 
 function returnShortName(s, d){
@@ -98,8 +106,11 @@ function toggle(){
 }
 
 function finalizeChoice(){
-  // TODO: to be fixed as soon as
-  // a workaround to the previous TODO is found.
+  /*
+   *  TODO: to be fixed as soon as
+   *  a workaround to the previous
+   * TODO is found.
+   */
   var tabs = document.getElementsByName('Select');
   var s = "";
   var value = [];
@@ -113,11 +124,11 @@ function finalizeChoice(){
       numChoices += 1;
     }
   }
-  //renderStatus("You have chosen the following tabs:\n" + s);
+
   document.getElementById('status').innerHTML = '';
   var tnode;
   var status = document.getElementById('status');
-  //renderStatus('');
+
   if(numChoices > 0){      
     var rand = Math.floor(Math.random()*101010);
     var inputHTML = '\nEnter the profile name: <input type="text" id="ProfileName" value="Profile' + rand + '"><br>';
@@ -141,11 +152,9 @@ function finalizeChoice(){
       var obj = {};
       obj[key] = value;
       chrome.storage.local.set(obj);
-      //chrome.
-      renderStatus('Profile saved to\n' + key);
+      renderStatus('Profile saved to\t' + key);
       
-      //write the profile to the local storage
-      //var 
+      /*  write the profile to the local storage */
       //debug();
     }
   } else {
@@ -157,6 +166,11 @@ function debug(){
   chrome.storage.local.get(null, function(items) {
     var allKeys = Object.keys(items);
     console.log(allKeys);
+    for(key in allKeys){
+      chrome.storage.local.get(key, function(item) {
+        console.log(item[key]);
+      });
+    }
   });
 }
 
@@ -168,8 +182,9 @@ function listProfiles(){
 
   chrome.storage.local.get(null, function(items) {
     var allKeys = Object.keys(items);
-    //console.log(allKeys);
-    //list all the existing options on loading
+    debug();
+
+    /*list all the existing options on loading*/
     var profile = new Array(allKeys.length);;
     var status = document.getElementById('status');
     var profileList = document.createElement("div");
@@ -178,14 +193,14 @@ function listProfiles(){
     
     for(i=0;i<allKeys.length;i++){
       profile[i] = document.createElement("div");
-      profile[i].setAttribute("id", "Profile" + i);
+      profile[i].setAttribute("id", allKeys[i]);
       profile[i].setAttribute("class", "Profile");
-      profile[i].innerHTML = allKeys[i];
+      profile[i].innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/click.png') + "></img> " + allKeys[i];
       profileList.appendChild(profile[i]);
 
       //profile.setAttribute("onclick", "loadProfile(this.innerHTML)");
       profile[i].addEventListener("click", function(){
-        loadProfile(this.innerHTML);
+        loadProfile(this.id);
       });
       
     }
@@ -195,23 +210,25 @@ function listProfiles(){
     sep.setAttribute("class", "separator");
     status.appendChild(sep);
 
-    //profiles have been loaded
-    //Adding the "New Profile" option
+     /*
+      * Profiles have been loaded.
+      * Adding the "New Profile" option
+      */
 
-    var icon = document.createElement("div");
-    icon.setAttribute("class", "icon");
+    //var icon = document.createElement("div");
+    //icon.setAttribute("class", "icon");
 
     var newProfile = document.createElement("div");
     newProfile.setAttribute("id", "NewProfile");
     newProfile.setAttribute("class", "ProfileOption");
-    newProfile.innerHTML = "Save The Session";
-    newProfile.appendChild(icon);
+    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img> Save The Session";
+    //newProfile.appendChild(icon);
     status.appendChild(newProfile);
 
     var removeProfile = document.createElement("div");
     removeProfile.setAttribute("id", "RemoveProfile");
     removeProfile.setAttribute("class", "ProfileOption");
-    removeProfile.innerHTML = "Remove saved profile";
+    removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img> Remove saved profile";
 
     status.appendChild(removeProfile);
 
@@ -229,19 +246,20 @@ function listProfiles(){
 }
 
 function loadProfile(profile){
-  //renderStatus("loading "+ profile);
 
-  chrome.storage.local.get(profile, function(item){
-    
+  chrome.storage.local.get(profile, function(item){    
     tabURLs = [];
     console.log(item[profile]);
-    /*for(it in [profile]){
-      console.log(it);
-      tabURLs.push(it);
-    }*/
     //console.log(tabURLs);
+
+    /*
+     *  This is where the new window
+     *  is created, and populated with
+     *  the list of URLs saved in the
+     *  profile.
+     */
     chrome.windows.create({url:item[profile]}, function(window){
-      console.log("hola");
+      console.log("hola amigos");
     });
   });
 }
@@ -253,13 +271,5 @@ function clearLocalStorage(){
 }
 
 document.addEventListener('DOMContentLoaded', function() {  
-  //renderStatus('Loading the content...');
-  //clearLocalStorage();
-  /*
-  queryTabs({
-  }, function(errorMessage) {
-    renderStatus('Cannot display results: ' + errorMessage);
-  });
-  */
   listProfiles();
 });

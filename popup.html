@@ -1,14 +1,12 @@
 <!doctype html>
 <!--
- This page is shown when the extension button is clicked, because the
- "browser_action" field in manifest.json contains the "default_popup" key with
- value "popup.html".
 /**
  * Author: Shibin George
  *         B.Tech CSE(4/4), Class of 2015
  *         National Institute of Technology, Warangal
  **/
 -->
+
 <html>
 <head>
   <title>Save-The-Session Popup</title>
@@ -19,7 +17,7 @@
         background-size: 100% 100%;*/
         background-color: white;
         font-family: 'DejaVu Sans', Arial, sans-serif;
-        font-size: 75%;
+        font-size: 80%;
         color: black;
         width: 350px;
       }
@@ -55,8 +53,11 @@
         border-top: 1px solid #ddd;
       }
       .icon {
-        background: url(./STS.png);
-        background-image: url(./STS.png);
+        /*background-image: url('STS.png');*/
+        /*background-color: black;*/
+        width: 16px;
+        height: 16px;
+        /*background-image: chrome.extension.getURL(STS.png);*/
         background-position-x: initial;
         background-position-y: initial;
         background-size: initial;
@@ -64,11 +65,10 @@
         background-repeat-y: initial;
         background-attachment: initial;
         background-origin: initial;
-        background-clip: initial;
-        background-color: initial;
+        /*background-clip: initial;*/
+        /*background-color: initial;*/
         display: inline-block;
-        width: 16px;
-        height: 16px;
+        
         vertical-align: middle;
       }
       </style>
