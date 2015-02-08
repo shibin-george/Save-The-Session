@@ -4,8 +4,7 @@
    *         National Institute of Technology, Warangal
    **/
 
-function getData(callback, errorCallback) {
-
+function queryTabs(callback, errorCallback) {
   //code to query the tabs
   var s = "";
   //var padding = "               ";
@@ -88,14 +87,14 @@ function toggle(){
   var c = document.getElementById('SelectALL');
   var bool = c.checked;
     //renderStatus(" " + bool + "");
-    var checks = document.getElementsByName('Select');
+  var checks = document.getElementsByName('Select');
 
-    for(i=0;i<checks.length;i++){
-      //console.log('toggle called for ' + i + ' currently ' + checks[i].checked);
-      if(checks[i].type=='checkbox'){
-        checks[i].checked = bool;
-      }
+  for(i=0;i<checks.length;i++){
+    //console.log('toggle called for ' + i + ' currently ' + checks[i].checked);
+    if(checks[i].type=='checkbox'){
+      checks[i].checked = bool;
     }
+  }
 }
 
 function finalizeChoice(){
@@ -103,12 +102,14 @@ function finalizeChoice(){
   // a workaround to the previous TODO is found.
   var tabs = document.getElementsByName('Select');
   var s = "";
+  var value = [];
   var numChoices = 0;
   console.log("Number of checkboxes = " + tabs.length);
   for(i=0; i<tabs.length; i++){
     if(tabs[i].checked==true){
       //this particular tab has to be added
       s += returnShortName(tabs[i].id, 40) + "\n";
+      value.push(tabs[i].id);
       numChoices += 1;
     }
   }
@@ -138,14 +139,14 @@ function finalizeChoice(){
     button.onclick = function(){
       var key = document.getElementById("ProfileName").value;
       var obj = {};
-      obj[key] = s;
+      obj[key] = value;
       chrome.storage.local.set(obj);
       //chrome.
       renderStatus('Profile saved to\n' + key);
       
       //write the profile to the local storage
       //var 
-      debug();
+      //debug();
     }
   } else {
     status.innerHTML = "You must choose atleat one tab."
@@ -160,13 +161,105 @@ function debug(){
 }
 
 function renderStatus(statusText) {
-  document.getElementById('status').textContent = statusText;4
+  document.getElementById('status').textContent = statusText;
+}
+
+function listProfiles(){
+
+  chrome.storage.local.get(null, function(items) {
+    var allKeys = Object.keys(items);
+    //console.log(allKeys);
+    //list all the existing options on loading
+    var profile = new Array(allKeys.length);;
+    var status = document.getElementById('status');
+    var profileList = document.createElement("div");
+    profileList.setAttribute("id", "ProfileList");
+    status.appendChild(profileList);
+    
+    for(i=0;i<allKeys.length;i++){
+      profile[i] = document.createElement("div");
+      profile[i].setAttribute("id", "Profile" + i);
+      profile[i].setAttribute("class", "Profile");
+      profile[i].innerHTML = allKeys[i];
+      profileList.appendChild(profile[i]);
+
+      //profile.setAttribute("onclick", "loadProfile(this.innerHTML)");
+      profile[i].addEventListener("click", function(){
+        loadProfile(this.innerHTML);
+      });
+      
+    }
+
+    var sep = document.createElement("div");
+    sep.setAttribute("id", "separator1");
+    sep.setAttribute("class", "separator");
+    status.appendChild(sep);
+
+    //profiles have been loaded
+    //Adding the "New Profile" option
+
+    var icon = document.createElement("div");
+    icon.setAttribute("class", "icon");
+
+    var newProfile = document.createElement("div");
+    newProfile.setAttribute("id", "NewProfile");
+    newProfile.setAttribute("class", "ProfileOption");
+    newProfile.innerHTML = "Save The Session";
+    newProfile.appendChild(icon);
+    status.appendChild(newProfile);
+
+    var removeProfile = document.createElement("div");
+    removeProfile.setAttribute("id", "RemoveProfile");
+    removeProfile.setAttribute("class", "ProfileOption");
+    removeProfile.innerHTML = "Remove saved profile";
+
+    status.appendChild(removeProfile);
+
+    newProfile.addEventListener("click", function(){
+      queryTabs({
+      }, function(errorMessage) {
+        renderStatus('Cannot display results: ' + errorMessage);
+      });
+    });
+
+    removeProfile.addEventListener("click", function(){
+      renderStatus('remove-profile coming soon');
+    });
+  }); 
+}
+
+function loadProfile(profile){
+  //renderStatus("loading "+ profile);
+
+  chrome.storage.local.get(profile, function(item){
+    
+    tabURLs = [];
+    console.log(item[profile]);
+    /*for(it in [profile]){
+      console.log(it);
+      tabURLs.push(it);
+    }*/
+    //console.log(tabURLs);
+    chrome.windows.create({url:item[profile]}, function(window){
+      console.log("hola");
+    });
+  });
+}
+
+function clearLocalStorage(){
+  chrome.storage.local.clear(function(){
+    console.log(chrome.runtime.lastError);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {  
-  renderStatus('Loading the content...');
-  getData({
+  //renderStatus('Loading the content...');
+  //clearLocalStorage();
+  /*
+  queryTabs({
   }, function(errorMessage) {
     renderStatus('Cannot display results: ' + errorMessage);
   });
+  */
+  listProfiles();
 });
