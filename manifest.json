@@ -6,12 +6,11 @@
 	 current Chrome session, and reload them later.",
 	"version": "1.0",
 
-	"browser_action": 
-	{
+	"browser_action": {
+		"default_icon": "STS.png",
 	    "default_popup": "popup.html"
 	},
-	"permissions":
-	[
+	"permissions": [
 	    "tabs",
 	    "storage",
 	    "unlimitedStorage"
