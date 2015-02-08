@@ -17,17 +17,59 @@
         /*background-image: url("codeforces.png");
         background-repeat: no-repeat;
         background-size: 100% 100%;*/
-        background-color: #72B2B2;
-        font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-        font-size: 100%;
+        background-color: white;
+        font-family: 'DejaVu Sans', Arial, sans-serif;
+        font-size: 75%;
         color: black;
+        width: 350px;
       }
       #status {
         /* avoid an excessively wide status text */
         white-space: pre;
         /*text-overflow: ellipsis;*/
         /*overflow: hidden;*/
-        width: 400px;
+        /*width: 200px;*/
+      }
+      .Profile, .ProfileOption {        
+        padding: 3px 24px;
+        cursor: pointer;
+      }
+      .Profile:hover {
+        /*padding: 3px 24px;*/
+        /*-webkit-padding-start: 5px;*/
+        border: solid 1px #bcd;
+        border-radius: 3px;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(0.4, hsl(215, 67%, 97%)), color-stop(0.41, hsl(213, 48%, 95%)));
+      }
+      .ProfileOption:hover {
+        /*padding: 3px 24px;*/
+        /*-webkit-padding-start: 5px;*/
+        border: solid 1px #bcd;
+        border-radius: 3px;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(0.4, hsl(215, 67%, 97%)), color-stop(0.41, hsl(213, 48%, 95%)));
+      }
+      .separator {
+        height: 0;
+        margin: 3px 2px;
+        border: 0;
+        border-top: 1px solid #ddd;
+      }
+      .icon {
+        background: url(./STS.png);
+        background-image: url(./STS.png);
+        background-position-x: initial;
+        background-position-y: initial;
+        background-size: initial;
+        background-repeat-x: initial; 
+        background-repeat-y: initial;
+        background-attachment: initial;
+        background-origin: initial;
+        background-clip: initial;
+        background-color: initial;
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
       }
       </style>
 
