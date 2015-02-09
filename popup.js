@@ -8,11 +8,13 @@ function queryTabs(callback, errorCallback) {
   
   //code to query the tabs
   var s = "";
+  //dummyLoading(100);
 
   chrome.tabs.query({'currentWindow':true}, function(tabs){
     var checkList = document.createElement("div");
     checkList.setAttribute("id", "checklist");
-    document.getElementById('status').innerHTML = 'The open tabs are: \n';
+    document.getElementById('status').innerHTML = 'Select the tabs to save: \n';
+    addSeparator('status');
     document.getElementById('status').appendChild(checkList);
 
     //code for appropriate padding
@@ -31,12 +33,20 @@ function queryTabs(callback, errorCallback) {
 
     for(i=0;i<tabs.length;i++){
       var s = tabs[i].url;
-      var shortname=returnShortName(s, displayLength);
+      var shortname = returnShortName(s, displayLength);
       console.log(shortname);
       //add a checkbox by the tab's name
       var box = document.createElement("div");
-      box.setAttribute("id", "Checkbox" + i);
-      box.setAttribute("name", s);
+      box.setAttribute("id", s);
+      box.setAttribute("name", "Checkbox");
+      box.className = "Profile";
+      box.onclick = function(){
+        if(this.className == 'Profile'){
+          this.className = 'SelectedProfile';
+        } else {
+          this.className = 'Profile';
+        }
+      }
 
       /*  TODO: this here is a vulnerability.
        *  if two tabs with the exact same url are open, 
@@ -44,23 +54,27 @@ function queryTabs(callback, errorCallback) {
        *  As per HTML standard, 
        *  no two elements should have same ID, document-wide.
        */
-      box.innerHTML = '<input type="checkbox" name="Select" id=' + s +'>\t' + shortname;
+      box.innerHTML = shortname;
 
       //add the checkbox to the list
       document.getElementById('checklist').appendChild(box);      
     }
+    addSeparator('checklist');
 
     //add a checkbox to select all
     var box = document.createElement("div");
     box.setAttribute("id", "CheckAll");
-    box.innerHTML = '\n<input type="checkbox" id="SelectALL">\t' + 'Click Here to select All\n';
+    //box.setAttribute("class", "Profile");
+    box.className = "Profile";
+    box.innerHTML = '\nClick Here to select All\n';
     document.getElementById('checklist').appendChild(box);
 
     //add an event handler for the 'Select all' checkbox
     //this invokes the toggle() function
-    document.getElementById('SelectALL').onchange = function(){
+    document.getElementById('CheckAll').onclick = function(){
       toggle();
     };
+    addSeparator('checklist');
 
     //add a button to finalise the list
     var button = document.createElement("div");
@@ -72,13 +86,19 @@ function queryTabs(callback, errorCallback) {
     
     document.getElementById('checklist').appendChild(button);
   });
-  dummyLoading(2);
+  
 }
 
 function dummyLoading(t){
   var status = document.getElementById('status');
   var w = document.createElement('div');
-  w.innerHTML = "<img class='loading' src=" + chrome.extension.getURL('loading.gif') + "</img>";
+  w.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/loading.gif') + "</img>";
+  status.appendChild(w);
+  for(i=0;i<t*1000;i++){
+    for(j=0;j<t*1000;j++){
+
+    }
+  }
 }
 
 function returnShortName(s, d){
@@ -92,16 +112,21 @@ function returnShortName(s, d){
 }
 
 function toggle(){  
-  var c = document.getElementById('SelectALL');
-  var bool = c.checked;
+  var c = document.getElementById('CheckAll');
+  if(c.className == 'Profile'){
+    c.className = 'SelectedProfile';
+  } else {
+    c.className = 'Profile';
+  }
+  var bool = c.className;
     //renderStatus(" " + bool + "");
-  var checks = document.getElementsByName('Select');
+  var checks = document.getElementsByName('Checkbox');
 
   for(i=0;i<checks.length;i++){
     //console.log('toggle called for ' + i + ' currently ' + checks[i].checked);
-    if(checks[i].type=='checkbox'){
-      checks[i].checked = bool;
-    }
+    //if(checks[i].type=='checkbox'){
+      checks[i].className = bool;
+    //}
   }
 }
 
@@ -111,13 +136,13 @@ function finalizeChoice(){
    *  a workaround to the previous
    * TODO is found.
    */
-  var tabs = document.getElementsByName('Select');
+  var tabs = document.getElementsByName('Checkbox');
   var s = "";
   var value = [];
   var numChoices = 0;
   console.log("Number of checkboxes = " + tabs.length);
   for(i=0; i<tabs.length; i++){
-    if(tabs[i].checked==true){
+    if(tabs[i].className == 'SelectedProfile'){
       //this particular tab has to be added
       s += returnShortName(tabs[i].id, 40) + "\n";
       value.push(tabs[i].id);
@@ -158,7 +183,7 @@ function finalizeChoice(){
       //debug();
     }
   } else {
-    status.innerHTML = "You must choose atleat one tab."
+    status.innerHTML = "You must choose atleast one tab."
   }    
 }
 
@@ -182,7 +207,7 @@ function listProfiles(){
 
   chrome.storage.local.get(null, function(items) {
     var allKeys = Object.keys(items);
-    debug();
+    //debug();
 
     /*list all the existing options on loading*/
     var profile = new Array(allKeys.length);;
@@ -204,12 +229,7 @@ function listProfiles(){
       });
       
     }
-
-    var sep = document.createElement("div");
-    sep.setAttribute("id", "separator1");
-    sep.setAttribute("class", "separator");
-    status.appendChild(sep);
-
+    addSeparator('status');
      /*
       * Profiles have been loaded.
       * Adding the "New Profile" option
@@ -240,9 +260,34 @@ function listProfiles(){
     });
 
     removeProfile.addEventListener("click", function(){
-      renderStatus('remove-profile coming soon');
+      //renderStatus('remove-profile coming soon');
+      deleteProfile();
     });
   }); 
+}
+
+function deleteProfile(){
+
+  //list all the profiles
+  chrome.storage.local.get(null, function(items){
+    var allKeys = Object.keys(items);
+    //console.log(allKeys);
+
+    for(i=0;i<allKeys.length;i++){
+      //console.log(allKeys[i]);
+      chrome.storage.local.get(allKeys[i], function(item){
+        console.log(item);
+      })
+    } 
+  });
+}
+
+function addSeparator(parentId){
+  var sep = document.createElement("div");
+  var parent = document.getElementById(parentId);
+  sep.setAttribute("id", "separator1");
+  sep.setAttribute("class", "separator");
+  parent.appendChild(sep);
 }
 
 function loadProfile(profile){
