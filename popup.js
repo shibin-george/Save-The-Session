@@ -4,8 +4,8 @@
    *         National Institute of Technology, Warangal
    **/
 
-function queryTabs(callback, errorCallback) {
-  
+   function queryTabs(callback, errorCallback) {
+
   //code to query the tabs
   var s = "";
   //dummyLoading(100);
@@ -35,7 +35,7 @@ function queryTabs(callback, errorCallback) {
       var s = tabs[i].url;
       var shortname = returnShortName(s, displayLength);
       console.log(shortname);
-      //add a checkbox by the tab's name
+      //add an option by the tab's name
       var box = document.createElement("div");
       box.setAttribute("id", s);
       box.setAttribute("name", "Checkbox");
@@ -54,7 +54,7 @@ function queryTabs(callback, errorCallback) {
        *  As per HTML standard, 
        *  no two elements should have same ID, document-wide.
        */
-      box.innerHTML = shortname;
+       box.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>\t" + shortname;
 
       //add the checkbox to the list
       document.getElementById('checklist').appendChild(box);      
@@ -66,7 +66,7 @@ function queryTabs(callback, errorCallback) {
     box.setAttribute("id", "CheckAll");
     //box.setAttribute("class", "Profile");
     box.className = "Profile";
-    box.innerHTML = '\nClick Here to select All\n';
+    box.innerHTML = 'Click Here to select All\n';
     document.getElementById('checklist').appendChild(box);
 
     //add an event handler for the 'Select all' checkbox
@@ -78,13 +78,11 @@ function queryTabs(callback, errorCallback) {
 
     //add a button to finalise the list
     var button = document.createElement("div");
-    button.setAttribute("id", "OKButton");
-    button.innerHTML = '\n<button> Click to add </button>';
-    button.onclick = function(){
-      finalizeChoice();
-    }
-    
+    button.innerHTML = '\n<button id="OKButton"> Click to add </button>';
     document.getElementById('checklist').appendChild(button);
+    document.getElementById('OKButton').addEventListener("click", function(){
+      finalizeChoice();
+    });    
   });
   
 }
@@ -120,9 +118,9 @@ function toggle(){
   }
   var bool = c.className;
     //renderStatus(" " + bool + "");
-  var checks = document.getElementsByName('Checkbox');
+    var checks = document.getElementsByName('Checkbox');
 
-  for(i=0;i<checks.length;i++){
+    for(i=0;i<checks.length;i++){
     //console.log('toggle called for ' + i + ' currently ' + checks[i].checked);
     //if(checks[i].type=='checkbox'){
       checks[i].className = bool;
@@ -136,12 +134,12 @@ function finalizeChoice(){
    *  a workaround to the previous
    * TODO is found.
    */
-  var tabs = document.getElementsByName('Checkbox');
-  var s = "";
-  var value = [];
-  var numChoices = 0;
-  console.log("Number of checkboxes = " + tabs.length);
-  for(i=0; i<tabs.length; i++){
+   var tabs = document.getElementsByName('Checkbox');
+   var s = "";
+   var value = [];
+   var numChoices = 0;
+   console.log("Number of checkboxes = " + tabs.length);
+   for(i=0; i<tabs.length; i++){
     if(tabs[i].className == 'SelectedProfile'){
       //this particular tab has to be added
       s += returnShortName(tabs[i].id, 40) + "\n";
@@ -177,8 +175,7 @@ function finalizeChoice(){
       var obj = {};
       obj[key] = value;
       chrome.storage.local.set(obj);
-      renderStatus('Profile saved to\t' + key);
-      
+      renderStatus('Profile saved to\t' + key);      
       /*  write the profile to the local storage */
       //debug();
     }
@@ -220,7 +217,7 @@ function listProfiles(){
       profile[i] = document.createElement("div");
       profile[i].setAttribute("id", allKeys[i]);
       profile[i].setAttribute("class", "Profile");
-      profile[i].innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/click.png') + "></img> " + allKeys[i];
+      profile[i].innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/click.png') + "></img>\t" + allKeys[i];
       profileList.appendChild(profile[i]);
 
       //profile.setAttribute("onclick", "loadProfile(this.innerHTML)");
@@ -232,7 +229,7 @@ function listProfiles(){
     addSeparator('status');
      /*
       * Profiles have been loaded.
-      * Adding the "New Profile" option
+      * Adding the "Save The Session" option
       */
 
     //var icon = document.createElement("div");
@@ -241,14 +238,15 @@ function listProfiles(){
     var newProfile = document.createElement("div");
     newProfile.setAttribute("id", "NewProfile");
     newProfile.setAttribute("class", "ProfileOption");
-    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img> Save The Session";
+    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>\tSave The Session";
+    newProfile.style.fontWeight = "bold";
     //newProfile.appendChild(icon);
     status.appendChild(newProfile);
 
     var removeProfile = document.createElement("div");
     removeProfile.setAttribute("id", "RemoveProfile");
     removeProfile.setAttribute("class", "ProfileOption");
-    removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img> Remove saved profile";
+    removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tRemove saved profile";
 
     status.appendChild(removeProfile);
 
@@ -271,14 +269,40 @@ function deleteProfile(){
   //list all the profiles
   chrome.storage.local.get(null, function(items){
     var allKeys = Object.keys(items);
-    //console.log(allKeys);
+    console.log(allKeys);
+    renderStatus('');
+    var status = document.getElementById('status');
 
     for(i=0;i<allKeys.length;i++){
-      //console.log(allKeys[i]);
-      chrome.storage.local.get(allKeys[i], function(item){
-        console.log(item);
-      })
+      //console.log(allKeys[i] + "\n" + items[allKeys[i]]);
+      var box = document.createElement("div");
+      box.setAttribute("id", allKeys[i]);
+      box.setAttribute("name", "Checkbox");
+      box.className = "Profile";
+      box.onclick = function(){
+        if(this.className == 'Profile'){
+          this.className = 'SelectedProfile';
+        } else {
+          this.className = 'Profile';
+        }
+      }
+      box.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\t" + allKeys[i];
+      status.appendChild(box);
+      
     } 
+    addSeparator('status');
+    var box = document.createElement("div");
+    box.setAttribute("id", "CheckAll");
+    //box.setAttribute("class", "Profile");
+    box.className = "Profile";
+    box.innerHTML = 'Click Here to select All\n';
+    document.getElementById('status').appendChild(box);
+
+    //add an event handler for the 'Select all' checkbox
+    //this invokes the toggle() function
+    document.getElementById('CheckAll').onclick = function(){
+      toggle();
+    };
   });
 }
 
@@ -303,10 +327,10 @@ function loadProfile(profile){
      *  the list of URLs saved in the
      *  profile.
      */
-    chrome.windows.create({url:item[profile]}, function(window){
+     chrome.windows.create({url:item[profile]}, function(window){
       console.log("hola amigos");
     });
-  });
+   });
 }
 
 function clearLocalStorage(){
