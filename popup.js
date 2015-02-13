@@ -80,7 +80,7 @@
     var button = document.createElement("div");
     button.innerHTML = '\n<button id="OKButton"> Click to add </button>';
     document.getElementById('checklist').appendChild(button);
-    document.getElementById('OKButton').addEventListener("click", function(){
+    button.addEventListener("click", function(){
       finalizeChoice();
     });    
   });
@@ -303,6 +303,35 @@ function deleteProfile(){
     document.getElementById('CheckAll').onclick = function(){
       toggle();
     };
+
+    //add a button to finalise the list
+    var button = document.createElement("div");
+    button.innerHTML = '\n<button id="OKButton"> Click to delete </button>';
+    document.getElementById('status').appendChild(button);
+    button.addEventListener("click", function(){
+      var tabs = document.getElementsByName('Checkbox');
+      var s = "";
+      var value = [];
+      var numChoices = 0;
+      console.log("Number of checkboxes = " + tabs.length);
+      for(i=0; i<tabs.length; i++){
+        if(tabs[i].className == 'SelectedProfile'){
+          //this particular tab has to be added
+          s += tabs[i].id + "\n";
+          value.push(tabs[i].id);
+          numChoices += 1;
+        }
+      } 
+      if(numChoices > 0){
+        //renderStatus('You have chosen to delete\n' + s);
+        chrome.storage.local.remove(value, function(){
+          renderStatus('Successfully removed selected profile(s)');
+        });
+      } else {
+        renderStatus('You must choose atleast one profile');
+      }
+      
+    });
   });
 }
 
