@@ -45,6 +45,8 @@
           this.className = 'SelectedProfile';
         } else {
           this.className = 'Profile';
+          var c = document.getElementById('CheckAll');
+          c.className = 'Profile';
         }
       }
 
@@ -77,8 +79,9 @@
     addSeparator('checklist');
 
     //add a button to finalise the list
-    var button = document.createElement("div");
-    button.innerHTML = '\n<button id="OKButton"> Click to add </button>';
+    var button = document.createElement("BUTTON");
+    var t = document.createTextNode("Add selected profile(s)");
+    button.appendChild(t);
     document.getElementById('checklist').appendChild(button);
     button.addEventListener("click", function(){
       finalizeChoice();
@@ -160,17 +163,22 @@ function finalizeChoice(){
     
     var button = document.createElement("div");
     button.setAttribute("id", "ProfileSubmitButton");
-    var b = '\n<button> Click to save </button>';
-    b += '\n\n** NOTE: The profile name above is randomly generated.\
+    button.innerHTML = '\n** NOTE: The profile name above is randomly generated.\
     \nIt is highly recommended that you change the name\
     \nto something not used before. Otherwise, this may\
-    \nlead to the profile being overwritten. Keep it short and simple'
-    button.innerHTML = b; 
+    \nlead to the profile being overwritten. Keep it short and simple.\
+    \nBeam me up, Scotty!\
+    \n\
+    \n'
+    var b = document.createElement("BUTTON");
+    var t = document.createTextNode("Save The Session");
+    b.appendChild(t);
+    button.appendChild(b);
     button.style.fontSize = "smaller";
     button.style.color = "red";
     status.appendChild(button);
 
-    button.onclick = function(){
+    b.onclick = function(){
       var key = document.getElementById("ProfileName").value;
       var obj = {};
       obj[key] = value;
@@ -247,7 +255,6 @@ function listProfiles(){
     removeProfile.setAttribute("id", "RemoveProfile");
     removeProfile.setAttribute("class", "ProfileOption");
     removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tRemove saved profile";
-
     status.appendChild(removeProfile);
 
     newProfile.addEventListener("click", function(){
@@ -261,7 +268,7 @@ function listProfiles(){
       //renderStatus('remove-profile coming soon');
       deleteProfile();
     });
-  }); 
+  });
 }
 
 function deleteProfile(){
@@ -284,6 +291,8 @@ function deleteProfile(){
           this.className = 'SelectedProfile';
         } else {
           this.className = 'Profile';
+          var c = document.getElementById('CheckAll');
+          c.className = 'Profile';
         }
       }
       box.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\t" + allKeys[i];
@@ -304,9 +313,11 @@ function deleteProfile(){
       toggle();
     };
 
+    addSeparator('status');
     //add a button to finalise the list
-    var button = document.createElement("div");
-    button.innerHTML = '\n<button id="OKButton"> Click to delete </button>';
+    var button = document.createElement("BUTTON");
+    var t = document.createTextNode("Delete selected profile(s)");       // Create a text node
+    button.appendChild(t);
     document.getElementById('status').appendChild(button);
     button.addEventListener("click", function(){
       var tabs = document.getElementsByName('Checkbox');
