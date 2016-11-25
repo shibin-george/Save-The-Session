@@ -246,7 +246,7 @@ function listProfiles(){
     var newProfile = document.createElement("div");
     newProfile.setAttribute("id", "NewProfile");
     newProfile.setAttribute("class", "ProfileOption");
-    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>\tSave The Session";
+    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>    Save The Session";
     newProfile.style.fontWeight = "bold";
     //newProfile.appendChild(icon);
     status.appendChild(newProfile);
@@ -268,6 +268,21 @@ function listProfiles(){
       //renderStatus('remove-profile coming soon');
       deleteProfile();
     });
+
+    // Add Soure-code link
+    var sourceCode = document.createElement("div");
+    sourceCode.setAttribute("id", "sourceCode");
+    sourceCode.setAttribute("class", "AboutOption");
+    sourceCode.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/Octocat/Octocat.png') + "></img>\t<a href='https://github.com/sg1993/Save-The-Session' target='_blank'>Know more about the extension</a>";
+    status.appendChild(sourceCode);
+
+    // Add Linkedin profile as well
+    var developer = document.createElement("div");
+    developer.setAttribute("id", "sourceCode");
+    developer.setAttribute("class", "AboutOption");
+    developer.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/developer.png') + "></img>\t<a href='https://in.linkedin.com/in/sg1993' target='_blank'>Wanna know more about me?</a>";
+    status.appendChild(developer);
+
   });
 }
 
