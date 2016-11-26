@@ -192,14 +192,18 @@ function listProfiles(){
 
     exportProfile.addEventListener("click", function(){
       //renderStatus('remove-profile coming soon');
-      exportProfile();
+      shipProfile();
     });
+
+    addSeparator('status');
 
     // Add Soure-code link
     var sourceCode = document.createElement("div");
     sourceCode.setAttribute("id", "sourceCode");
     sourceCode.setAttribute("class", "AboutOption");
-    sourceCode.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/Octocat/Octocat.png') + "></img>\t<a href='https://github.com/sg1993/Save-The-Session' target='_blank'>Know more about the extension</a>";
+    var version = chrome.runtime.getManifest().version;
+    sourceCode.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/Octocat/Octocat.png') + "></img>\t<a href='https://github.com/sg1993/Save-The-Session' target='_blank'>Know more about the extension</a>"
+                         + " (v" + version + ")";
     status.appendChild(sourceCode);
 
     // Add Linkedin profile as well
