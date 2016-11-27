@@ -172,12 +172,6 @@ function listProfiles(){
     removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tRemove saved profile";
     status.appendChild(removeProfile);
 
-    var exportProfile = document.createElement("div");
-    exportProfile.setAttribute("id", "RemoveProfile");
-    exportProfile.setAttribute("class", "ProfileOption");
-    exportProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tExport saved profile";
-    status.appendChild(exportProfile);
-
     newProfile.addEventListener("click", function(){
       queryTabs({
       }, function(errorMessage) {
@@ -188,11 +182,6 @@ function listProfiles(){
     removeProfile.addEventListener("click", function(){
       //renderStatus('remove-profile coming soon');
       deleteProfile();
-    });
-
-    exportProfile.addEventListener("click", function(){
-      //renderStatus('remove-profile coming soon');
-      shipProfile();
     });
 
     addSeparator('status');
