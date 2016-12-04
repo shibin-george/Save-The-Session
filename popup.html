@@ -15,9 +15,9 @@
         /*background-image: url("codeforces.png");
         background-repeat: no-repeat;
         background-size: 100% 100%;*/
-        background-color: white;
-        font-family: 'DejaVu Sans', Arial, sans-serif;
-        font-size: 80%;
+        background-color: rgba(247, 246, 242, 1);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;#"Noto Sans", Arial, sans-serif;
+        font-size: 13px;
         color: black;
         width: 350px;
       }
@@ -33,18 +33,22 @@
         cursor: pointer;
       }
       .Profile:hover {
+        text-shadow:1px 0px 0px black;
+        letter-spacing: 1px;
         padding: 3px 15px;
         /*-webkit-padding-start: 5px;*/
         border: solid 0px #bcd;
         border-radius: 3px;
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(167,199,220,1)), color-stop(100%,rgba(133,178,211,1)));
       }
       .ProfileOption:hover {
         padding: 3px 15px;
+        text-shadow:1px 0px 0px black;
+        letter-spacing: 1px;
         /*-webkit-padding-start: 5px;*/
         border: solid 0px #bcd;
         border-radius: 3px;
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(214,249,255,1)), color-stop(100%,rgba(158,232,250,1)));
+        -webkit-transition: all 0.2s ease-out;
+        transition: all 0.2s ease-out;
       }
       .AboutOption {
         padding: 3px 15px;
@@ -52,7 +56,6 @@
         /*-webkit-padding-start: 5px;*/
         border: solid 0px #bcd;
         border-radius: 3px;
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,1)));
       }
       .separator {
         height: 0;
@@ -61,14 +64,14 @@
         border-top: 2px solid #ddd;
       }
       .SelectedProfile {
-        font-weight: bold;
-        font-size: 85%;
+        text-shadow:1px 0px 0px black;
+        letter-spacing: 1px;
+        font-size: 100%;
         padding: 3px 15px;
         /*-webkit-padding-start: 5px;*/
         cursor: pointer;
         border: solid 0px #bcd;
         border-radius: 3px;
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(214,249,255,1)), color-stop(100%,rgba(158,232,250,1)));
       }
       .icon {
         /*background-image: url('STS.png');*/

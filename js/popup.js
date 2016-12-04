@@ -60,7 +60,7 @@ function finalizeChoice(){
    for(i=0; i<tabs.length; i++){
     if(tabs[i].className == 'SelectedProfile'){
       //this particular tab has to be added
-      s += returnShortName(tabs[i].id, 40) + "\n";
+      s += returnShortName(tabs[i].id, 20) + "\n";
       value.push(tabs[i].id);
       numChoices += 1;
     }
@@ -72,13 +72,13 @@ function finalizeChoice(){
 
   if(numChoices > 0){      
     var rand = Math.floor(Math.random()*101010);
-    var inputHTML = '\nEnter the profile name: <input type="text" id="ProfileName" value="Profile' + rand + '"><br>';
+    var inputHTML = '\nEnter the Session name: <input type="text" id="ProfileName" value="Profile' + rand + '"><br>';
     var buttonHTML = ''
     status.innerHTML = 'You have chosen the following tabs:\n\n' + s + inputHTML ;
     
     var button = document.createElement("div");
     button.setAttribute("id", "ProfileSubmitButton");
-    button.innerHTML = '\n** NOTE: The profile name above is randomly generated.\
+    button.innerHTML = '\n** NOTE: The session name above is randomly generated.\
     \nIt is highly recommended that you change the name\
     \nto something not used before. Otherwise, this may\
     \nlead to the profile being overwritten. Keep it short and simple.\
@@ -97,10 +97,9 @@ function finalizeChoice(){
       var key = document.getElementById("ProfileName").value;
       var obj = {};
       obj[key] = value;
-      chrome.storage.local.set(obj);
-      renderStatus('Profile saved to\t' + key);      
       /*  write the profile to the local storage */
-      //debug();
+      chrome.storage.local.set(obj);
+      renderStatus('Session saved to: ' + key);
     }
   } else {
     status.innerHTML = "You must choose atleast one tab."
@@ -161,7 +160,7 @@ function listProfiles(){
     var newProfile = document.createElement("div");
     newProfile.setAttribute("id", "NewProfile");
     newProfile.setAttribute("class", "ProfileOption");
-    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>    Save The Session";
+    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>   Save The Session";
     newProfile.style.fontWeight = "bold";
     //newProfile.appendChild(icon);
     status.appendChild(newProfile);
@@ -169,14 +168,14 @@ function listProfiles(){
     var removeProfile = document.createElement("div");
     removeProfile.setAttribute("id", "RemoveProfile");
     removeProfile.setAttribute("class", "ProfileOption");
-    removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tRemove saved profile";
+    removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tRemove saved Session";
     status.appendChild(removeProfile);
 
-    var exportProfile = document.createElement("div");
-    exportProfile.setAttribute("id", "RemoveProfile");
-    exportProfile.setAttribute("class", "ProfileOption");
-    exportProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tExport saved profile";
-    status.appendChild(exportProfile);
+   // var exportProfile = document.createElement("div");
+   // exportProfile.setAttribute("id", "RemoveProfile");
+   // exportProfile.setAttribute("class", "ProfileOption");
+   // exportProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tExport saved Session";
+   // status.appendChild(exportProfile);
 
     newProfile.addEventListener("click", function(){
       queryTabs({
@@ -190,10 +189,10 @@ function listProfiles(){
       deleteProfile();
     });
 
-    exportProfile.addEventListener("click", function(){
-      //renderStatus('remove-profile coming soon');
-      shipProfile();
-    });
+    //exportProfile.addEventListener("click", function(){
+    //  //renderStatus('remove-profile coming soon');
+    //  shipProfile();
+    //});
 
     addSeparator('status');
 

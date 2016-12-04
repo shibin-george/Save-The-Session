@@ -31,7 +31,7 @@ function queryTabs(callback, errorCallback) {
 
     for(i=0;i<tabs.length;i++){
       var s = tabs[i].url;
-      var shortname = returnShortName(s, displayLength);
+      var shortname = returnShortName(s, 30/*displayLength*/);
       console.log(shortname);
       //add an option by the tab's name
       var box = document.createElement("div");
@@ -72,7 +72,7 @@ function queryTabs(callback, errorCallback) {
 
     //add a button to finalise the list
     var button = document.createElement("BUTTON");
-    var t = document.createTextNode("Add selected profile(s)");
+    var t = document.createTextNode("Add selected session(s)");
     button.appendChild(t);
     document.getElementById('checklist').appendChild(button);
     button.addEventListener("click", function(){
@@ -125,7 +125,7 @@ function deleteProfile(){
     addSeparator('status');
     //add a button to finalise the list
     var button = document.createElement("BUTTON");
-    var t = document.createTextNode("Delete selected profile(s)");       // Create a text node
+    var t = document.createTextNode("Delete selected session(s)");       // Create a text node
     button.appendChild(t);
     document.getElementById('status').appendChild(button);
     button.addEventListener("click", function(){
@@ -145,10 +145,10 @@ function deleteProfile(){
       if(numChoices > 0){
         //renderStatus('You have chosen to delete\n' + s);
         chrome.storage.local.remove(value, function(){
-          renderStatus('Successfully removed selected profile(s)');
+          renderStatus('Successfully removed selected sessions(s)');
         });
       } else {
-        renderStatus('You must choose atleast one profile');
+        renderStatus('You must choose atleast one session');
       }
     });
   });
