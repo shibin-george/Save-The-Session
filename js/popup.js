@@ -248,6 +248,8 @@ function clearLocalStorage(){
   });
 }
 
+chrome.runtime.setUninstallURL("https://github.com/sg1993/Save-The-Session/blob/master/UNINSTALL.md", null);
+
 document.addEventListener('DOMContentLoaded', function() {  
   listProfiles();
 });
