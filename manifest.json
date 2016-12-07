@@ -2,12 +2,12 @@
   	"manifest_version": 2,
 
   	"name": "Save The Session",
-	"description": "This extension helps you to save your the tabs in your current Chrome session, and reload them later.",
+	"description": "This extension helps you save the tabs in your current Chrome session, and reload them later.",
 	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnpEuB14/oyMuiEr6cEqX6pin/yuRXBYIh653N+A+hWb3GzHfUyyT6mh/lrzrYI0bhAmpspjKpDh662hAg6WIQ1m8u7AqSsFptLEpQPp+mD5Ha+EWwiqGaYMvz3r8k4maTZ5i5YrPB7cHbvKFfcS8Lfg4rqs6lLB4+easalWzWKIxalKQx4ezLQh37hGZPaOPbCqSLDZ0+xt6c/6EkcGnB5XnhhlWxScBIbw5AaV3weXmz8gjur6E3awDXYBdyAxO8cGzsEgKOGe+TEyQUkrQc+shYHoJ/018Z5aNCkEDw9X4cZtq5tqIi6MKsqwcYi4tXYhID2SeVlRGGkQcmegm6QIDAQAB",
-	"version": "1.0",
+	"version": "1.6.2",
 
 	"browser_action": {
-		"default_icon": "assets/STS.png",
+	    "default_icon": "assets/STS.png",
 	    "default_popup": "popup.html"
 	},
 	"permissions": [
