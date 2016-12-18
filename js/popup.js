@@ -46,18 +46,13 @@ function toggle(){
   }
 }
 
-function finalizeChoice(){
-  /*
-   *  TODO: to be fixed as soon as
-   *  a workaround to the previous
-   * TODO is found.
-   */
-   var tabs = document.getElementsByName('Checkbox');
-   var s = "";
-   var value = [];
-   var numChoices = 0;
-   console.log("Number of checkboxes = " + tabs.length);
-   for(i=0; i<tabs.length; i++){
+function finalizeChoice(addNewProfile){
+  var tabs = document.getElementsByName('Checkbox');
+  var s = "";
+  var value = [];
+  var numChoices = 0;
+  console.log("Number of checkboxes = " + tabs.length);
+  for(i=0; i<tabs.length; i++){
     if(tabs[i].className == 'SelectedProfile'){
       //this particular tab has to be added
       s += returnShortName(tabs[i].id, 20) + "\n";
@@ -70,7 +65,10 @@ function finalizeChoice(){
   var tnode;
   var status = document.getElementById('status');
 
-  if(numChoices > 0){      
+  if(numChoices <= 0){
+    status.innerHTML = "You must choose atleast one tab.";
+  } else if(addNewProfile){
+    //Save to a new Session
     var rand = Math.floor(Math.random()*101010);
     var inputHTML = '\nEnter the Session name: <input type="text" id="ProfileName" value="Profile' + rand + '"><br>';
     var buttonHTML = ''
@@ -102,20 +100,21 @@ function finalizeChoice(){
       renderStatus('Session saved to: ' + key);
     }
   } else {
-    status.innerHTML = "You must choose atleast one tab."
-  }    
-}
-
-function debug(){
-  chrome.storage.local.get(null, function(items) {
-    var allKeys = Object.keys(items);
-    console.log(allKeys);
-    for(key in allKeys){
-      chrome.storage.local.get(key, function(item) {
-        console.log(item[key]);
+    // Add to an existing Session
+    // At this point, list the Profiles to choose from
+    processProfiles(false, function(profiles) {
+      console.log("back to finalize " + profiles);
+      profiles.forEach(function(profile, index){
+        chrome.storage.local.get(profile, function(db){
+          console.log("before: " + db[profile].length);
+          var obj = {};
+          obj[profile] = db[profile].concat(value);
+          chrome.storage.local.set(obj);
+          console.log("after: " + obj[profile].length);
+        });
       });
-    }
-  });
+    });
+  }
 }
 
 function renderStatus(statusText) {
@@ -160,10 +159,16 @@ function listProfiles(){
     var newProfile = document.createElement("div");
     newProfile.setAttribute("id", "NewProfile");
     newProfile.setAttribute("class", "ProfileOption");
-    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>   Save The Session";
+    newProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/new.png') + "></img>    Save The Session";
     newProfile.style.fontWeight = "bold";
     //newProfile.appendChild(icon);
     status.appendChild(newProfile);
+
+    var addToExisting = document.createElement("div");
+    addToExisting.setAttribute("id", "addToExisting");
+    addToExisting.setAttribute("class", "ProfileOption");
+    addToExisting.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/add_to.png') + "></img>\tAdd to existing Session";
+    status.appendChild(addToExisting);
 
     var removeProfile = document.createElement("div");
     removeProfile.setAttribute("id", "RemoveProfile");
@@ -171,28 +176,19 @@ function listProfiles(){
     removeProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tRemove saved Session";
     status.appendChild(removeProfile);
 
-   // var exportProfile = document.createElement("div");
-   // exportProfile.setAttribute("id", "RemoveProfile");
-   // exportProfile.setAttribute("class", "ProfileOption");
-   // exportProfile.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\tExport saved Session";
-   // status.appendChild(exportProfile);
-
     newProfile.addEventListener("click", function(){
-      queryTabs({
-      }, function(errorMessage) {
-        renderStatus('Cannot display results: ' + errorMessage);
-      });
+      queryTabs(true);
     });
 
     removeProfile.addEventListener("click", function(){
       //renderStatus('remove-profile coming soon');
-      deleteProfile();
+      processProfiles(true);
     });
 
-    //exportProfile.addEventListener("click", function(){
-    //  //renderStatus('remove-profile coming soon');
-    //  shipProfile();
-    //});
+    addToExisting.addEventListener("click", function(){
+    //renderStatus('remove-profile coming soon');
+      addToProfile();
+    });
 
     addSeparator('status');
 

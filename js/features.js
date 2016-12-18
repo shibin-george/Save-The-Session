@@ -3,15 +3,22 @@
    *         https://www.linkedin.com/in/sg1993
    **/
 
-function queryTabs(callback, errorCallback) {
+function queryTabs(addNewProfile) {
 
   //code to query the tabs
   var s = "";
+  if(addNewProfile){
+    description = 'Select the tabs to save: \n';
+    buttonText = 'Add selected tab(s)';
+  } else {
+    description = 'Select the tabs to add to existing Session: \n';
+    buttonText = 'Add selected tab(s) to existing Session';
+  }
 
   chrome.tabs.query({'currentWindow':true}, function(tabs){
     var checkList = document.createElement("div");
     checkList.setAttribute("id", "checklist");
-    document.getElementById('status').innerHTML = 'Select the tabs to save: \n';
+    document.getElementById('status').innerHTML = description;
     addSeparator('status');
     document.getElementById('status').appendChild(checkList);
 
@@ -72,24 +79,46 @@ function queryTabs(callback, errorCallback) {
 
     //add a button to finalise the list
     var button = document.createElement("BUTTON");
-    var t = document.createTextNode("Add selected session(s)");
+    var t = document.createTextNode(buttonText);
     button.appendChild(t);
     document.getElementById('checklist').appendChild(button);
     button.addEventListener("click", function(){
-      finalizeChoice();
+      finalizeChoice(addNewProfile);
     });
   });
 }
 
-function deleteProfile(){
+function addToProfile(){
+  // queryTabs to list
+  // which tabs to add to a Session
+  // Send "false" to indicate not to create a new session
+  queryTabs(false);
+}
+
+function processProfiles(deleteProfile, callback){
 
   //list all the profiles
+  if(deleteProfile){
+    url = 'assets/delete.png';
+    buttonText = 'Delete selected session(s)';
+  } else {
+    url = 'assets/add_to.png';
+    buttonText = 'Add tabs to selected session(s)';
+  }
+
   chrome.storage.local.get(null, function(items){
     var allKeys = Object.keys(items);
     console.log(allKeys);
     renderStatus('');
     var status = document.getElementById('status');
 
+    if(!deleteProfile){
+      var checkList = document.createElement("div");
+      checkList.setAttribute("id", "checklist");
+      document.getElementById('status').innerHTML = 'Select which existing session(s) to add to:';
+      addSeparator('status');
+      document.getElementById('status').appendChild(checkList);
+    }
     for(i=0;i<allKeys.length;i++){
       //console.log(allKeys[i] + "\n" + items[allKeys[i]]);
       var box = document.createElement("div");
@@ -105,7 +134,7 @@ function deleteProfile(){
           c.className = 'Profile';
         }
       }
-      box.innerHTML = "<img class='icon' src=" + chrome.extension.getURL('assets/delete.png') + "></img>\t" + allKeys[i];
+      box.innerHTML = "<img class='icon' src=" + chrome.extension.getURL(url) + "></img>\t" + allKeys[i];
       status.appendChild(box);
     }
     addSeparator('status');
@@ -125,7 +154,7 @@ function deleteProfile(){
     addSeparator('status');
     //add a button to finalise the list
     var button = document.createElement("BUTTON");
-    var t = document.createTextNode("Delete selected session(s)");       // Create a text node
+    var t = document.createTextNode(buttonText);       // Create a text node
     button.appendChild(t);
     document.getElementById('status').appendChild(button);
     button.addEventListener("click", function(){
@@ -134,6 +163,7 @@ function deleteProfile(){
       var value = [];
       var numChoices = 0;
       console.log("Number of checkboxes = " + tabs.length);
+
       for(i=0; i<tabs.length; i++){
         if(tabs[i].className == 'SelectedProfile'){
           //this particular tab has to be added
@@ -142,13 +172,17 @@ function deleteProfile(){
           numChoices += 1;
         }
       }
-      if(numChoices > 0){
+
+      if(numChoices <= 0){
+        renderStatus('You must choose atleast one session');
+      } else if (deleteProfile){
         //renderStatus('You have chosen to delete\n' + s);
         chrome.storage.local.remove(value, function(){
           renderStatus('Successfully removed selected sessions(s)');
         });
       } else {
-        renderStatus('You must choose atleast one session');
+        callback(value);
+        renderStatus('Session(s) modified successfully');
       }
     });
   });
