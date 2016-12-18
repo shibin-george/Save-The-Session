@@ -133,6 +133,10 @@ function listProfiles(){
     var profileList = document.createElement("div");
     profileList.setAttribute("id", "ProfileList");
     status.appendChild(profileList);
+
+    if(allKeys.length == 0){
+      status.innerHTML = "\nYou haven't saved any Sessions yet. Get started now!\n\n";
+    }
     
     for(i=0;i<allKeys.length;i++){
       profile[i] = document.createElement("div");
